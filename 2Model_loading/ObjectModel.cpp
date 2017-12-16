@@ -44,6 +44,7 @@ ObjectModel::ObjectModel(char* texName, Buffers* buffers , int type)
 
 	TextureIndex = loadBMP_custom(TextureName);
 	Type = type; 
+	ObjectBoundingBox = ObjectBuffers->getBoundingBox();
 }
 // Special Constructor for spaceship
 ObjectModel::ObjectModel(char* ObjName, char *texName)
@@ -59,7 +60,7 @@ ObjectModel::ObjectModel(char* ObjName, char *texName)
 
 	TextureIndex = loadBMP_custom(TextureName);
 	Type = 0;
-
+	ObjectBoundingBox = ObjectBuffers->getBoundingBox();
 }
 
 ObjectModel::~ObjectModel()
@@ -140,7 +141,7 @@ bool ObjectModel::setTexture(char texName[])
 
 
 Box& ObjectModel::getBoundingBox() {
-	return ObjectBuffers->getBoundingBox();
+	return ObjectBoundingBox;
 }
 
 Buffers* ObjectModel::getBuffers()
@@ -150,10 +151,10 @@ Buffers* ObjectModel::getBuffers()
 
 bool ObjectModel::detectCollision(Box b)
 {
-	Box a = getBoundingBox(); // my bounding box
-	bool Xintersection = a.Xmin <= b.Xmax && a.Xmax >= b.Xmin;
-	bool Yintersection = a.Ymin <= b.Ymax && a.Ymax >= b.Ymin;
-	bool Zintersection = a.Zmin <= b.Zmax && a.Zmax >= b.Zmin;
+	//Box a = getBoundingBox(); // my bounding box
+	bool Xintersection = ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin;
+	bool Yintersection = ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin;
+	bool Zintersection = ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin;
 	return (Xintersection && Yintersection && Zintersection);
 }
 
@@ -165,11 +166,23 @@ int ObjectModel::getType()
 
 void ObjectModel::translateBoundingBox(float x, float y, float z)
 {
-		ObjectBuffers->translateBoundingBox(x, y, z);
+	//ObjectBuffers->translateObjectBoundingBox(x, y, z);
+	ObjectBoundingBox.Xmax += x;
+	ObjectBoundingBox.Xmin += x;
+	ObjectBoundingBox.Ymax += y;
+	ObjectBoundingBox.Ymin += y;
+	ObjectBoundingBox.Zmax += z;
+	ObjectBoundingBox.Zmin += z;
 
 }
 void ObjectModel::scaleBoundingBox(float x, float y, float z)
 {
-	ObjectBuffers->scaleBoundingBox(x, y, z);
+	//ObjectBoundingBox(x, y, z);
+	ObjectBoundingBox.Xmax *= x;
+	ObjectBoundingBox.Xmin *= x;
+	ObjectBoundingBox.Ymax *= y;
+	ObjectBoundingBox.Ymin *= y;
+	ObjectBoundingBox.Zmax *= z;
+	ObjectBoundingBox.Zmin *= z;
 
 }

@@ -15,6 +15,8 @@ class ObjectModel
 	glm::mat4 Scaling;
 	glm::mat4 Rotation;
 	glm::mat4 ModelMatrix;
+
+	Box ObjectBoundingBox;
 	 
 
 public:
