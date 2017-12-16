@@ -72,8 +72,6 @@ void SceneReader(string filename) //Scene.txt
 	else cout << "Unable to open file";
 }
 
-
-
 int main(void)
 {
     // Initialise GLFW
@@ -96,7 +94,8 @@ int main(void)
     }
 
     // Initialize GLEW
-    if (glewInit() != GLEW_OK) {
+    if (glewInit() != GLEW_OK) 
+	{
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
@@ -210,14 +209,15 @@ int main(void)
 				XYZRotation = glm::mat4(1);
 			}
 
+			//glm::mat4 NewModelMatrix = Translation * Rotation * XYZRotation * Scaling;
 			glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
 			Objects[i]->setModelMatrix(NewModelMatrix);
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
 		}
 
-		handleSpaceShipCollision(SpaceGhost, getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z - 3.0f));		
-	    glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
-		glm::mat4 SpaceshipTranslation = translate(mat4(), vec3(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z - 3.0f)));
+		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, (getSSPosition().y), (getSSPosition().z));
+		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
+		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
 		//SpaceShip.translateObject(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z) - 3.0f);
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
@@ -226,10 +226,10 @@ int main(void)
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
         glfwSwapBuffers();	//Swap buffers
-
     }
 
     while (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS && glfwGetWindowParam(GLFW_OPENED));
+
     // Cleanup VBO and shader
     glDeleteProgram(programID);
     glDeleteTextures(1, &TextureID);
@@ -237,13 +237,15 @@ int main(void)
     return 0;
 }
 
-
 void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 {
 	bool collision;
 	SS.translateBoundingBox(dx, dy, dz);
 	for (int i = 0; i < nObjects; i++)
 	{
+		cout << SS.getBoundingBox().Xmax << " " << SS.getBoundingBox().Xmin << " ";
+		cout << SS.getBoundingBox().Ymax << " " << SS.getBoundingBox().Ymin << " ";
+		cout << SS.getBoundingBox().Zmax << " " << SS.getBoundingBox().Zmin << endl;
 		collision = Objects[i]->detectCollision(SS.getBoundingBox());
 		if (collision)
 		{
@@ -252,19 +254,20 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 			switch (type) //GAME LOGIC
 			{
 				case 1: //Rewarding
+					//cout << "COLLISION" << endl;
 
 				break;
 
 				case 2: //LightTunnel
-
+					//cout << "COLLISION" << endl;
 				break;
 
 				case 3: //Collision--> End Game !
-
+					//cout << "COLLISION" << endl;
 				break;
 
 				default: //FinishLine
-
+					//cout << "COLLISION" << endl;
 				break;
 			}
 		}
