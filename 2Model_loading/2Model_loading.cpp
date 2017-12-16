@@ -168,8 +168,8 @@ int main(void)
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0)
 		{
-		nbFrames = 0;
-		lastTime += 1.0;
+			nbFrames = 0;
+			lastTime += 1.0;
 		}
 		orientation += 3.14159f / 6.0f * deltaTime;
 		orientation_sin = sin(3.14159f / 2.0f * currentTime);
@@ -215,13 +215,14 @@ int main(void)
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
 		}
 
-		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, (getSSPosition().y), (getSSPosition().z));
+		//SpaceShip.translateObject(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z) - 3.0f);
+		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
 		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
 		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
-		//SpaceShip.translateObject(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z) - 3.0f);
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
 		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+		SpaceGhost.SpaceShipBoundingBox(getSSPosition());
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
@@ -243,19 +244,21 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 	SS.translateBoundingBox(dx, dy, dz);
 	for (int i = 0; i < nObjects; i++)
 	{
-		cout << SS.getBoundingBox().Xmax << " " << SS.getBoundingBox().Xmin << " ";
+		/*cout << SS.getBoundingBox().Xmax << " " << SS.getBoundingBox().Xmin << " ";
 		cout << SS.getBoundingBox().Ymax << " " << SS.getBoundingBox().Ymin << " ";
-		cout << SS.getBoundingBox().Zmax << " " << SS.getBoundingBox().Zmin << endl;
+		cout << SS.getBoundingBox().Zmax << " " << SS.getBoundingBox().Zmin << endl;*/
 		collision = Objects[i]->detectCollision(SS.getBoundingBox());
 		if (collision)
 		{
 			int type = Objects[i]->getType();
-			cout << "\n Collision with " << type;
+			cout << "Collision with " << type << " ";
+			cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+			cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
+			cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
 			switch (type) //GAME LOGIC
 			{
 				case 1: //Rewarding
 					//cout << "COLLISION" << endl;
-
 				break;
 
 				case 2: //LightTunnel

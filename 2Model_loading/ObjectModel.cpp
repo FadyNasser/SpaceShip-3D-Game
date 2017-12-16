@@ -1,5 +1,6 @@
 #include "ObjectModel.h"
-
+#include <iostream>
+using namespace std;
 //
 ////	// Shall they be added in GLobal Header file? or passed to the function?
 
@@ -88,14 +89,14 @@ bool ObjectModel::Draw(GLuint programID, GLuint MatrixID, GLuint vertexPosition_
 	glEnableVertexAttribArray(vertexUVID);
 	glBindBuffer(GL_ARRAY_BUFFER, ObjectBuffers->getUVBuffer());
 	glVertexAttribPointer
-		(
+	(
 			vertexUVID,                   // The attribute we want to configure
 			2,                            // size : U+V => 2
 			GL_FLOAT,                     // type
 			GL_FALSE,                     // normalized?
 			0,                            // stride
 			(void*)0                      // array buffer offset
-			);
+	);
 	computeMatricesFromInputs();
 	
 	glm::mat4 SSMVP = getProjectionMatrix() * getViewMatrix() * ModelMatrix;
@@ -117,7 +118,6 @@ void ObjectModel::constructModelMatrix( glm::vec3 Translation, glm::vec3 Scaling
 {
 	this->Translation=translate(mat4(), Translation); 
 	this->Scaling = scale(mat4(),Scaling); 
-	//this->Rotation = eulerAngleX(xrotate) * eulerAngleY(yrotate);
 	this->Rotation = eulerAngleYXZ(Rotation.y, Rotation.x, Rotation.z);
 	this->ModelMatrix = this->Translation*this->Rotation*this->Scaling;
 	translateBoundingBox(Translation.x, Translation.y, Translation.z); 
@@ -139,8 +139,8 @@ bool ObjectModel::setTexture(char texName[])
 	return true; 
 }
 
-
-Box& ObjectModel::getBoundingBox() {
+Box& ObjectModel::getBoundingBox() 
+{
 	return ObjectBoundingBox;
 }
 
@@ -152,12 +152,11 @@ Buffers* ObjectModel::getBuffers()
 bool ObjectModel::detectCollision(Box b)
 {
 	//Box a = getBoundingBox(); // my bounding box
-	bool Xintersection = ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin;
-	bool Yintersection = ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin;
-	bool Zintersection = ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin;
+	bool Xintersection = (ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin) || (ObjectBoundingBox.Xmax <= b.Xmin && ObjectBoundingBox.Xmin >= b.Xmax);
+	bool Yintersection = (ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin) || (ObjectBoundingBox.Ymax <= b.Ymin && ObjectBoundingBox.Xmin >= b.Ymax);
+	bool Zintersection = (ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin) || (ObjectBoundingBox.Zmax <= b.Zmin && ObjectBoundingBox.Xmin >= b.Zmax);
 	return (Xintersection && Yintersection && Zintersection);
 }
-
 
 int ObjectModel::getType()
 {
@@ -173,8 +172,19 @@ void ObjectModel::translateBoundingBox(float x, float y, float z)
 	ObjectBoundingBox.Ymin += y;
 	ObjectBoundingBox.Zmax += z;
 	ObjectBoundingBox.Zmin += z;
-
 }
+
+void ObjectModel::SpaceShipBoundingBox(glm::vec3 SSBox)
+{
+	ObjectBoundingBox.Xmax = SSBox.x + 0.25f;
+	ObjectBoundingBox.Xmin = SSBox.x - 0.25f;
+	ObjectBoundingBox.Ymax = SSBox.y + 0.25f;
+	ObjectBoundingBox.Ymin = SSBox.y - 0.25f;
+	ObjectBoundingBox.Zmax = SSBox.z + 0.25f;
+	ObjectBoundingBox.Zmin = SSBox.z - 0.25f;
+}
+
+
 void ObjectModel::scaleBoundingBox(float x, float y, float z)
 {
 	//ObjectBoundingBox(x, y, z);
@@ -184,5 +194,4 @@ void ObjectModel::scaleBoundingBox(float x, float y, float z)
 	ObjectBoundingBox.Ymin *= y;
 	ObjectBoundingBox.Zmax *= z;
 	ObjectBoundingBox.Zmin *= z;
-
 }

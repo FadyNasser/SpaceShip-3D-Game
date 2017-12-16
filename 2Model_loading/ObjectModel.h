@@ -18,7 +18,6 @@ class ObjectModel
 
 	Box ObjectBoundingBox;
 	 
-
 public:
 	ObjectModel( char* texName, Buffers* buffers , int type); // construct object 
 	ObjectModel(char* ObjName, char *texName); // special constructor for spaceship child class 
@@ -39,6 +38,7 @@ public:
 	virtual void constructModelMatrix(glm::vec3 Translation, glm::vec3 Scaling, glm::vec3 Rotation);
 	virtual bool setTexture(char texName[]);
 	virtual bool detectCollision(Box bb);
+	void ObjectModel::SpaceShipBoundingBox(glm::vec3 SSBox);
 
 };
 

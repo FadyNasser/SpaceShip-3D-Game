@@ -13,6 +13,4 @@
 	Spaceship();
 	~Spaceship();
 
-
-
 };
