@@ -2,10 +2,10 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "controls.hpp"
 using namespace glm;
 using namespace std;
 
-#include "controls.hpp"
 float rightFactor;
 float fuel = 10000;
 bool fuelRunOut = false;
@@ -13,11 +13,13 @@ glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 glm::vec3 position = glm::vec3(0, 0, 5);
 glm::vec3 SSPosition = glm::vec3(0, 0.5, 8);
+
 glm::mat4 getViewMatrix() 
 {
 	return ViewMatrix;
 }
-glm::mat4 getProjectionMatrix() {
+glm::mat4 getProjectionMatrix() 
+{
 	return ProjectionMatrix;
 }
 
@@ -28,7 +30,7 @@ glm::vec3 getCameraPosition()
 
 glm::vec3 getSSPosition()
 {
-	// SSPosition.x = position.x;
+	//SSPosition.x = position.x;
 	SSPosition.y = position.y - 0.5f;
 	SSPosition.z = position.z - 3.0f;
 	return SSPosition;
@@ -46,8 +48,8 @@ float mouseSpeed = 0.005f;
 bool wasPressed = false;
 float factor = 0.0f;
 
-void computeMatricesFromInputs() {
-
+void computeMatricesFromInputs() 
+{
 	// glfwGetTime is called only once, the first time this function is called
 	static double lastTime = glfwGetTime();
 
