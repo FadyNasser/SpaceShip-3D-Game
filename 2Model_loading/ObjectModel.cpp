@@ -129,8 +129,10 @@ void ObjectModel::constructModelMatrix( glm::vec3 Translation, glm::vec3 Scaling
 	this->Scaling = scale(mat4(),Scaling); 
 	this->Rotation = eulerAngleYXZ(Rotation.y, Rotation.x, Rotation.z);
 	this->ModelMatrix = this->Translation*this->Rotation*this->Scaling;
+	// ORDER MATTERS : Scale BoundingBox then translate it ...NEVER THE OPPOSITE 
+	scaleBoundingBox(Scaling.x, Scaling.y, Scaling.z); 
 	translateBoundingBox(Translation.x, Translation.y, Translation.z); 
-	scaleBoundingBox(Scaling.x, Scaling.y, Scaling.z);
+	
 }
 
 bool ObjectModel::setTexture(char texName[])
@@ -161,9 +163,9 @@ Buffers* ObjectModel::getBuffers()
 bool ObjectModel::detectCollision(Box b)
 {
 	//Box a = getBoundingBox(); // my bounding box
-	bool Xintersection = (ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin) || (ObjectBoundingBox.Xmax <= b.Xmin && ObjectBoundingBox.Xmin >= b.Xmax);
-	bool Yintersection = (ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin) || (ObjectBoundingBox.Ymax <= b.Ymin && ObjectBoundingBox.Xmin >= b.Ymax);
-	bool Zintersection = (ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin) || (ObjectBoundingBox.Zmax <= b.Zmin && ObjectBoundingBox.Xmin >= b.Zmax);
+	bool Xintersection = (ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin);// || (ObjectBoundingBox.Xmax <= b.Xmin && ObjectBoundingBox.Xmin >= b.Xmax);
+	bool Yintersection = (ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin);// || (ObjectBoundingBox.Ymax <= b.Ymin && ObjectBoundingBox.Xmin >= b.Ymax);
+	bool Zintersection = (ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin);// || (ObjectBoundingBox.Zmax <= b.Zmin && ObjectBoundingBox.Xmin >= b.Zmax);
 	return (Xintersection && Yintersection && Zintersection);
 }
 
@@ -172,26 +174,39 @@ int ObjectModel::getType()
 	return Type;
 }
 
-void ObjectModel::translateBoundingBox(float x, float y, float z)
-{
+void ObjectModel::translateBoundingBox(float x, float y, float z) // changes the position of xMin,yMin,Zmin based on the scaled Xlength and yLength 
+{/*
+	struct Box myBox = ObjectBuffers->getBufferBoundingBox();
+	xLength = myBox.Xmax - myBox.Xmin;
+	yLength = myBox.Ymax - myBox.Ymin;
+	zLength= myBox.Zmax - myBox.Zmin;
+*/
 	ObjectBoundingBox.Xmax = x + (xLength / 2);
 	ObjectBoundingBox.Xmin = x - (xLength / 2);
 	ObjectBoundingBox.Ymax = y + (yLength / 2);
 	ObjectBoundingBox.Ymin = y - (yLength / 2);
 	ObjectBoundingBox.Zmax = z + (zLength / 2);
 	ObjectBoundingBox.Zmin = z - (zLength / 2);
+
 }
 
 
-void ObjectModel::scaleBoundingBox(float x, float y, float z)
+void ObjectModel::scaleBoundingBox(float x, float y, float z) // update xLength , yLength , zLength 
 {
+	struct Box myBox = ObjectBuffers->getBufferBoundingBox();
+
+	xLength = myBox.Xmax - myBox.Xmin;
+	yLength = myBox.Ymax - myBox.Ymin;
+	zLength = myBox.Zmax - myBox.Zmin;
 	xLength *= x;
 	yLength *= y;
 	zLength *= z;
-	ObjectBoundingBox.Xmax *= x;
-	ObjectBoundingBox.Xmin *= x;
-	ObjectBoundingBox.Ymax *= y;
-	ObjectBoundingBox.Ymin *= y;
-	ObjectBoundingBox.Zmax *= z;
-	ObjectBoundingBox.Zmin *= z;
+	
+}
+
+void ObjectModel::rotateObject(glm::mat4 newRotation)
+{
+
+	this->Rotation = newRotation; 
+	ModelMatrix = Translation*Rotation*Scaling;
 }

@@ -183,9 +183,9 @@ int main(void)
 
 		for (int i = 0; i < nObjects; i++)
 		{
-			glm::mat4 Scaling = Objects[i]->GetModelScaling();
+			/*glm::mat4 Scaling = Objects[i]->GetModelScaling();
 			glm::mat4 Rotation = Objects[i]->GetModelRotation();
-			glm::mat4 Translation = Objects[i]->GetModelTranslation();
+			glm::mat4 Translation = Objects[i]->GetModelTranslation();*/
 			glm::mat4 XYZRotation;
 			if (Objects[i]->getType() == EndOfGame)
 			{
@@ -210,48 +210,25 @@ int main(void)
 			}
 
 			//glm::mat4 NewModelMatrix = Translation * Rotation * XYZRotation * Scaling;
-			glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
-			Objects[i]->setModelMatrix(NewModelMatrix);
+			/*glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
+			Objects[i]->setModelMatrix(NewModelMatrix);*/
+			Objects[i]->rotateObject(XYZRotation); 
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-			
-			
+		
 
-			float xLength = (Objects[i]->getBoundingBox().Xmax - Objects[i]->getBoundingBox().Xmin)/2;
-			float yLength = (Objects[i]->getBoundingBox().Ymax - Objects[i]->getBoundingBox().Ymin)/2;
-			float zLength = (Objects[i]->getBoundingBox().Zmax - Objects[i]->getBoundingBox().Zmin)/2;
-			cout << i << " " << xLength << " " << yLength << " " << zLength << endl;
-			if (getSSPosition().x == xLength)
-			{
-				cout << "Collide in X" << endl;
-			}
-			if (getSSPosition().y == yLength)
-			{
-				cout << "Collide in Y" << endl;
-			}
-			if (getSSPosition().z == zLength)
-			{
-				cout << "Collide in Z" << endl;
-			}
+	
 		}
-
-
-
-		Buffers temp("Fuel.obj");
-		ObjectModel Xmin("Gift.bmp", &temp, 1);
-		ObjectModel Xmax("Gift.bmp", &temp, 1);
-		Xmin.constructModelMatrix(vec3(Objects[0]->getBoundingBox().Xmin, 1, 1), vec3(1, 1, 1), vec3(0, 0, 0));
-		Xmin.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-
-		Xmax.constructModelMatrix(vec3(Objects[0]->getBoundingBox().Xmax, 1, 1), vec3(1, 1, 1), vec3(0, 0, 0));
-		Xmax.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		//SpaceShip.translateObject(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z) - 3.0f);
+			
 		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
+		// translateBoundingBox is ALREADY CALLED in handleSpaceShip Collision
+		//SpaceGhost.translateBoundingBox(getSSPosition().x, getSSPosition().y, getSSPosition().z);   
 		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
 		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
+		
 		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		SpaceGhost.translateBoundingBox(getSSPosition().x, getSSPosition().y, getSSPosition().z);
+		
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
@@ -273,29 +250,25 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 	SS.translateBoundingBox(dx, dy, dz);
 	for (int i = 0; i < nObjects; i++)
 	{
-		/*cout << SS.getBoundingBox().Xmax << " " << SS.getBoundingBox().Xmin << " ";
-		cout << SS.getBoundingBox().Ymax << " " << SS.getBoundingBox().Ymin << " ";
-		cout << SS.getBoundingBox().Zmax << " " << SS.getBoundingBox().Zmin << endl;*/
 		collision = Objects[i]->detectCollision(SS.getBoundingBox());
 		if (collision)
 		{
 			int type = Objects[i]->getType();
  			cout << "Collision with " << type << " ";
-			cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
-			cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
-			cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
+ 		
 			switch (type) //GAME LOGIC
 			{
 				case 1: //Rewarding
-					//cout << "COLLISION" << endl;
+					cout << "COLLISION AT XMIN" <<Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " "; 
 				break;
 
 				case 2: //LightTunnel
-					//cout << "COLLISION" << endl;
+					cout << "Collision with a light tunnel" << endl;
+					
 				break;
 
 				case 3: //Collision--> End Game !
-					//cout << "COLLISION" << endl;
+					cout << "COLLISION" <<Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
 				break;
 
 				default: //FinishLine

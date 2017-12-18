@@ -41,6 +41,7 @@ public:
 	virtual void constructModelMatrix(glm::vec3 Translation, glm::vec3 Scaling, glm::vec3 Rotation);
 	virtual bool setTexture(char texName[]);
 	virtual bool detectCollision(Box bb);
+	void rotateObject(glm::mat4 Rotation); 
 
 };
 

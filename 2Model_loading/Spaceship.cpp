@@ -6,9 +6,11 @@ Spaceship::Spaceship():ObjectModel("spaceship_clean.obj","Spaceship.bmp")
 	ObjectModel::getBuffers()->Create();
 	ObjectBoundingBox = ObjectModel::getBuffers()->getBufferBoundingBox();
 	ObjectModel::scaleBoundingBox(0.25f, 0.25f, 0.25f);
-	xLength = ObjectBoundingBox.Xmax - ObjectBoundingBox.Xmin;
-	yLength = ObjectBoundingBox.Ymax - ObjectBoundingBox.Ymin;
-	zLength = ObjectBoundingBox.Zmax - ObjectBoundingBox.Zmin;
+    
+// Fuel Calculation
+	Fuel = 10000; 
+	Velocity = 0; 
+
 }
 Spaceship::~Spaceship()
 {}
