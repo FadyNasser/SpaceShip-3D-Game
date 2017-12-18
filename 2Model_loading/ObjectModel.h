@@ -16,7 +16,10 @@ class ObjectModel
 	glm::mat4 Rotation;
 	glm::mat4 ModelMatrix;
 
+protected:
+
 	Box ObjectBoundingBox;
+	float xLength = 0, yLength = 0, zLength = 0;
 	 
 public:
 	ObjectModel( char* texName, Buffers* buffers , int type); // construct object 
@@ -38,7 +41,6 @@ public:
 	virtual void constructModelMatrix(glm::vec3 Translation, glm::vec3 Scaling, glm::vec3 Rotation);
 	virtual bool setTexture(char texName[]);
 	virtual bool detectCollision(Box bb);
-	void ObjectModel::SpaceShipBoundingBox(glm::vec3 SSBox);
 
 };
 

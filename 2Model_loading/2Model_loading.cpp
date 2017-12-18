@@ -213,8 +213,37 @@ int main(void)
 			glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
 			Objects[i]->setModelMatrix(NewModelMatrix);
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+			
+			
+
+			float xLength = (Objects[i]->getBoundingBox().Xmax - Objects[i]->getBoundingBox().Xmin)/2;
+			float yLength = (Objects[i]->getBoundingBox().Ymax - Objects[i]->getBoundingBox().Ymin)/2;
+			float zLength = (Objects[i]->getBoundingBox().Zmax - Objects[i]->getBoundingBox().Zmin)/2;
+			cout << i << " " << xLength << " " << yLength << " " << zLength << endl;
+			if (getSSPosition().x == xLength)
+			{
+				cout << "Collide in X" << endl;
+			}
+			if (getSSPosition().y == yLength)
+			{
+				cout << "Collide in Y" << endl;
+			}
+			if (getSSPosition().z == zLength)
+			{
+				cout << "Collide in Z" << endl;
+			}
 		}
 
+
+
+		Buffers temp("Fuel.obj");
+		ObjectModel Xmin("Gift.bmp", &temp, 1);
+		ObjectModel Xmax("Gift.bmp", &temp, 1);
+		Xmin.constructModelMatrix(vec3(Objects[0]->getBoundingBox().Xmin, 1, 1), vec3(1, 1, 1), vec3(0, 0, 0));
+		Xmin.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+
+		Xmax.constructModelMatrix(vec3(Objects[0]->getBoundingBox().Xmax, 1, 1), vec3(1, 1, 1), vec3(0, 0, 0));
+		Xmax.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
 		//SpaceShip.translateObject(getCameraPosition().x, (getCameraPosition().y - 0.5f), (getCameraPosition().z) - 3.0f);
 		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
 		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
@@ -222,7 +251,7 @@ int main(void)
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
 		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		SpaceGhost.SpaceShipBoundingBox(getSSPosition());
+		SpaceGhost.translateBoundingBox(getSSPosition().x, getSSPosition().y, getSSPosition().z);
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
@@ -251,7 +280,7 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 		if (collision)
 		{
 			int type = Objects[i]->getType();
-			cout << "Collision with " << type << " ";
+ 			cout << "Collision with " << type << " ";
 			cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
 			cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
 			cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;

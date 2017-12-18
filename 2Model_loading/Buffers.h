@@ -1,12 +1,13 @@
 #pragma once
 #include "GameHeader.h"
-struct Box {
-	float Xmin=1000; 
-	float Xmax = -1000;
-	float Ymin = 1000;
-	float Ymax = -1000;
-	float Zmin = 1000;
-	float Zmax = -1000;
+struct Box 
+{
+		float Xmin;
+		float Xmax;
+		float Ymin;
+		float Ymax;
+		float Zmin;
+		float Zmax;
 };
 class Buffers
 {
@@ -20,7 +21,7 @@ class Buffers
 	GLuint UVBuffer;
 	GLuint NormalBuffer; 
 	
-	struct Box BoundingBox; 
+	struct Box BufferBoundingBox; 
 
 public:
 	Buffers(char * name);
@@ -30,12 +31,12 @@ public:
 	GLuint getUVBuffer();
 	GLuint getNormalBuffer();
 
-	Box& getBoundingBox();
+	Box& getBufferBoundingBox();
 	std::vector<glm::vec3> getVerticesVector();
 	std::vector<glm::vec2> getUVsVector();
 	std::vector<glm::vec3> getNormalsVector();
-	void translateBoundingBox(float x, float y, float z);
-	void scaleBoundingBox(float x, float y, float z);
+	//void translateBoundingBox(float x, float y, float z);
+	//void scaleBoundingBox(float x, float y, float z);
 	bool Create();
 
 };

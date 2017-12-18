@@ -10,13 +10,12 @@ Buffers::Buffers(char *name)
 		i++;
 	}
 	ObjectName[i] = '\0';
-	BoundingBox.Xmin = 1000; 
-	BoundingBox.Ymin = 1000;
-	BoundingBox.Zmin = 1000;
-	BoundingBox.Xmax = -1000;
-	BoundingBox.Ymax = -1000;
-	BoundingBox.Zmax = -1000;
-
+	BufferBoundingBox.Xmin = 1000; 
+	BufferBoundingBox.Ymin = 1000;
+	BufferBoundingBox.Zmin = 1000;
+	BufferBoundingBox.Xmax = -1000;
+	BufferBoundingBox.Ymax = -1000;
+	BufferBoundingBox.Zmax = -1000;
 }
 
 Buffers::~Buffers()
@@ -41,7 +40,6 @@ std::vector<glm::vec3>   Buffers::getVerticesVector()
 	return Vertices; 
 }
 
-
 std::vector<glm::vec2>  Buffers::getUVsVector()
 {
 	return Uvs; 
@@ -53,7 +51,7 @@ std::vector<glm::vec3>  Buffers::getNormalsVector(){
 
 bool Buffers::Create()
 {
-	bool Loading = loadOBJ(ObjectName, Vertices, Uvs, Normals, BoundingBox);
+	bool Loading = loadOBJ(ObjectName, Vertices, Uvs, Normals, BufferBoundingBox);
 	// Generate Vertex Buffer 
 	glGenBuffers(1, &VertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
@@ -69,28 +67,29 @@ bool Buffers::Create()
 	return Loading;
 }
 
-Box& Buffers::getBoundingBox() {
-	return BoundingBox;
-}
-void Buffers::translateBoundingBox(float x, float y, float z)
+Box& Buffers::getBufferBoundingBox() 
 {
-	/*
-	BoundingBox.Xmax += x;
-	BoundingBox.Xmin += x;
-	BoundingBox.Ymax += y;
-	BoundingBox.Ymin += y;
-	BoundingBox.Zmax += z;
-	BoundingBox.Zmin +=z;
-	*/
+	return BufferBoundingBox;
 }
-void Buffers::scaleBoundingBox(float x, float y, float z)
-{
-	/*
-	BoundingBox.Xmax *= x;
-	BoundingBox.Xmin *= x;
-	BoundingBox.Ymax *= y;
-	BoundingBox.Ymin *= y;
-	BoundingBox.Zmax *= z;
-	BoundingBox.Zmin *= z;
-	*/
-}
+//void Buffers::translateBoundingBox(float x, float y, float z)
+//{
+//	/*
+//	BoundingBox.Xmax += x;
+//	BoundingBox.Xmin += x;
+//	BoundingBox.Ymax += y;
+//	BoundingBox.Ymin += y;
+//	BoundingBox.Zmax += z;
+//	BoundingBox.Zmin +=z;
+//	*/
+//}
+//void Buffers::scaleBoundingBox(float x, float y, float z)
+//{
+//	/*
+//	BoundingBox.Xmax *= x;
+//	BoundingBox.Xmin *= x;
+//	BoundingBox.Ymax *= y;
+//	BoundingBox.Ymin *= y;
+//	BoundingBox.Zmax *= z;
+//	BoundingBox.Zmin *= z;
+//	*/
+//}

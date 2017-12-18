@@ -45,7 +45,11 @@ ObjectModel::ObjectModel(char* texName, Buffers* buffers , int type)
 
 	TextureIndex = loadBMP_custom(TextureName);
 	Type = type; 
-	ObjectBoundingBox = ObjectBuffers->getBoundingBox();
+	//ObjectBoundingBox = ObjectBuffers->getBoundingBox();
+	ObjectBoundingBox = getBuffers()->getBufferBoundingBox();
+	xLength = ObjectModel::ObjectBoundingBox.Xmax - ObjectModel::ObjectBoundingBox.Xmin;
+	yLength = ObjectModel::ObjectBoundingBox.Ymax - ObjectModel::ObjectBoundingBox.Ymin;
+	zLength = ObjectModel::ObjectBoundingBox.Zmax - ObjectModel::ObjectBoundingBox.Zmin;
 }
 // Special Constructor for spaceship
 ObjectModel::ObjectModel(char* ObjName, char *texName)
@@ -61,7 +65,11 @@ ObjectModel::ObjectModel(char* ObjName, char *texName)
 
 	TextureIndex = loadBMP_custom(TextureName);
 	Type = 0;
-	ObjectBoundingBox = ObjectBuffers->getBoundingBox();
+	//ObjectBoundingBox = ObjectBuffers->getBoundingBox();
+	/*ObjectBoundingBox = getBuffers()->getBufferBoundingBox();
+	xLength = ObjectModel::ObjectBoundingBox.Xmax - ObjectModel::ObjectBoundingBox.Xmin;
+	yLength = ObjectModel::ObjectBoundingBox.Ymax - ObjectModel::ObjectBoundingBox.Ymin;
+	zLength = ObjectModel::ObjectBoundingBox.Zmax - ObjectModel::ObjectBoundingBox.Zmin;*/
 }
 
 ObjectModel::~ObjectModel()
@@ -114,9 +122,10 @@ bool ObjectModel::setModelMatrix(glm::mat4 model)
 	ModelMatrix = model; 
 	return true; 
 }
+
 void ObjectModel::constructModelMatrix( glm::vec3 Translation, glm::vec3 Scaling, glm::vec3 Rotation)
 {
-	this->Translation=translate(mat4(), Translation); 
+	this->Translation = translate(mat4(), Translation); 
 	this->Scaling = scale(mat4(),Scaling); 
 	this->Rotation = eulerAngleYXZ(Rotation.y, Rotation.x, Rotation.z);
 	this->ModelMatrix = this->Translation*this->Rotation*this->Scaling;
@@ -165,29 +174,20 @@ int ObjectModel::getType()
 
 void ObjectModel::translateBoundingBox(float x, float y, float z)
 {
-	//ObjectBuffers->translateObjectBoundingBox(x, y, z);
-	ObjectBoundingBox.Xmax += x;
-	ObjectBoundingBox.Xmin += x;
-	ObjectBoundingBox.Ymax += y;
-	ObjectBoundingBox.Ymin += y;
-	ObjectBoundingBox.Zmax += z;
-	ObjectBoundingBox.Zmin += z;
-}
-
-void ObjectModel::SpaceShipBoundingBox(glm::vec3 SSBox)
-{
-	ObjectBoundingBox.Xmax = SSBox.x + 0.25f;
-	ObjectBoundingBox.Xmin = SSBox.x - 0.25f;
-	ObjectBoundingBox.Ymax = SSBox.y + 0.25f;
-	ObjectBoundingBox.Ymin = SSBox.y - 0.25f;
-	ObjectBoundingBox.Zmax = SSBox.z + 0.25f;
-	ObjectBoundingBox.Zmin = SSBox.z - 0.25f;
+	ObjectBoundingBox.Xmax = x + (xLength / 2);
+	ObjectBoundingBox.Xmin = x - (xLength / 2);
+	ObjectBoundingBox.Ymax = y + (yLength / 2);
+	ObjectBoundingBox.Ymin = y - (yLength / 2);
+	ObjectBoundingBox.Zmax = z + (zLength / 2);
+	ObjectBoundingBox.Zmin = z - (zLength / 2);
 }
 
 
 void ObjectModel::scaleBoundingBox(float x, float y, float z)
 {
-	//ObjectBoundingBox(x, y, z);
+	xLength *= x;
+	yLength *= y;
+	zLength *= z;
 	ObjectBoundingBox.Xmax *= x;
 	ObjectBoundingBox.Xmin *= x;
 	ObjectBoundingBox.Ymax *= y;
