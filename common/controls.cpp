@@ -47,6 +47,8 @@ float speed = 40.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 bool wasPressed = false;
 float factor = 0.0f;
+bool firstTime = true;
+int xpos, ypos;
 
 void computeMatricesFromInputs() 
 {
@@ -57,9 +59,11 @@ void computeMatricesFromInputs()
 	double currentTime = glfwGetTime();
 	float deltaTime = float(currentTime - lastTime);
 
-	// Get mouse position
-	int xpos, ypos;
-	glfwGetMousePos(&xpos, &ypos);
+    // Get mouse position
+    if(firstTime){
+        firstTime = false;
+        glfwGetMousePos(&xpos, &ypos);
+    }
 
 	// Reset mouse position for next frame
 	// EDIT : Doesn't work on Mac OS, hence the code below is a bit different from the website's
@@ -89,11 +93,7 @@ void computeMatricesFromInputs()
 	glm::vec3 up = glm::cross(right, direction);
 	//if was pressed last time, increment and multiply by speed as a range from 0 to 1, else start over.
 
-	// Move forward
-	if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) 
-	{
-		position += up * deltaTime * speed;
-	}
+
 	if (glfwGetKey(GLFW_KEY_SPACE) == GLFW_PRESS) 
 	{
 		if (wasPressed && factor < 1) 
@@ -123,27 +123,30 @@ void computeMatricesFromInputs()
 	{
 		cout << "run out of fuel"; 
 		fuelRunOut = true;
-	}
-	// Move backward
+    }
+    // Move Up
+    if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        position += up * deltaTime * speed*0.4f;
+    }
+    // Move Down
 	if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS) 
 	{
-		position -= up * deltaTime * speed;
+        position -= up * deltaTime * speed*0.4f;
 	}
 	// Strafe right
 	if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) 
 	{
-		if (rightFactor <= 15) 
-		{
-			rightFactor += 0.1;
+        if (SSPosition.x <= 1)
+        {
 			SSPosition += right * deltaTime * speed*0.2f;
 		}
 	}
 	// Strafe left
 	if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) 
 	{
-		if (rightFactor >= -13) 
-		{
-			rightFactor -= 0.1;
+        if (SSPosition.x >= -1)
+        {
 			SSPosition -= right * deltaTime * speed*0.2f;
 		}
 	}
