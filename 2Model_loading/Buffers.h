@@ -38,5 +38,4 @@ public:
 	//void translateBoundingBox(float x, float y, float z);
 	//void scaleBoundingBox(float x, float y, float z);
 	bool Create();
-
 };

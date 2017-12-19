@@ -150,6 +150,7 @@ int main(void)
 	float orientation = 0.0f;
 	float orientation_sin = 0.0f;
 	float BHorientation = 3.14159f / 2.0f;
+	bool scaleonce = true;
 
 	SceneReader("Scene.txt");
 	
@@ -208,27 +209,35 @@ int main(void)
 			{
 				XYZRotation = glm::mat4(1);
 			}
-
 			//glm::mat4 NewModelMatrix = Translation * Rotation * XYZRotation * Scaling;
-			/*glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
-			Objects[i]->setModelMatrix(NewModelMatrix);*/
+			//glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
+			//Objects[i]->setModelMatrix(NewModelMatrix);
 			Objects[i]->rotateObject(XYZRotation); 
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		
-
-	
+			
+			if (Objects[i]->getType() == 2) // change type to see Boundries of Each object #Araaaaaaaf_By7saaaal_El7l
+			{								// El boundary box byrotate m3 el object 
+				//draw lines
+				glLineWidth(10);
+				glBegin(GL_LINES);
+				glVertex3f(Objects[i]->getBoundingBox().Xmin, Objects[i]->getBoundingBox().Ymin, Objects[i]->getBoundingBox().Zmin);
+				glVertex3f(Objects[i]->getBoundingBox().Xmax, Objects[i]->getBoundingBox().Ymax, Objects[i]->getBoundingBox().Zmax);
+				glEnd();
+			}
 		}
 			
 		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
-		// translateBoundingBox is ALREADY CALLED in handleSpaceShip Collision
-		//SpaceGhost.translateBoundingBox(getSSPosition().x, getSSPosition().y, getSSPosition().z);   
+		//translateBoundingBox is ALREADY CALLED in handleSpaceShip Collision
 		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
 		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
-		
 		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		
+		if (scaleonce)
+		{
+			SpaceGhost.scaleBoundingBox(0.25f, 0.25f, 0.25f);
+			scaleonce = false;
+		}
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
@@ -254,25 +263,43 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 		if (collision)
 		{
 			int type = Objects[i]->getType();
- 			cout << "Collision with " << type << " ";
+ 			//cout << "Collision with " << type << " ";
+			cout << SS.getBoundingBox().Xmin << " " << SS.getBoundingBox().Xmax << " ";
+			cout << SS.getBoundingBox().Ymin << " " << SS.getBoundingBox().Ymax << " ";
+			cout << SS.getBoundingBox().Zmin << " " << SS.getBoundingBox().Zmax << endl;
  		
 			switch (type) //GAME LOGIC
 			{
 				case 1: //Rewarding
-					cout << "COLLISION AT XMIN" <<Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " "; 
+					cout << "Collision with Gift ";
+					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
+					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
 				break;
 
 				case 2: //LightTunnel
-					cout << "Collision with a light tunnel" << endl;
-					
+					cout << "Collision with a light tunnel ";
+					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
+					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
 				break;
 
 				case 3: //Collision--> End Game !
-					cout << "COLLISION" <<Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+					cout << "Collision with Plant ";
+					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
+					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
+ 				break;
+
+				case 4: //Blackhole !
+					cout << "COLLISION with Blackhole ";
+					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
+					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
+					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
 				break;
 
 				default: //FinishLine
-					//cout << "COLLISION" << endl;
+					cout <<"" ;
 				break;
 			}
 		}
