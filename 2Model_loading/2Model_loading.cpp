@@ -1,9 +1,9 @@
 #pragma once
 #include "Spaceship.h"
 #include <iostream>
-#include <iostream>
 #include <fstream>
 #include <string>
+#include <Windows.h>
 using namespace std;
 
 #define FinishLine 1
@@ -222,7 +222,7 @@ int main(void)
 		}
 		else
 		{
-			cout << "Game Over" << endl;
+  			cout << "Game Over" << endl;
 			break;
 		}
 		decrementTime(1);
@@ -263,44 +263,47 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
  			cout << "Collision with " << type << " ";
  		
 			switch (type) //GAME LOGIC
-			{
+			{    
 				case 1: //FinishLine
 					cout << "Congratulation" << endl;
+					Beep(950, 1000);					
 					EndGame();
 					break;
 
 				case 2: //LightTunnel => Increase Speed
 					cout << "Collision with a Light Tunnel" << endl;
- 					incrementSpeed(10);
+					Beep(150, 1000);
+ 					incrementSpeed(5);
 					break;
 
 				case 3: //Planet or Meteriod => Game Over
 					cout << "Collision with a Planet" << endl;
+					Beep(400, 1000);
 					EndGame();
 					break;
 
 				case 4: //BlackHole => decrease Speed
 					cout << "Collision with a BlackHole" << endl;
-					decrementSpeed(10);
-					decrementTime(5);
+					Beep(200, 1000);
+					decrementSpeed(5);
+					decrementTime(20);
 					break;
 
 				case 5://Gift => increase Time Left
 					cout << "Collision with a Gift"<< endl;
+					Beep(1000, 500);
 					incrementTime(20);
 					break;
 
 				case 6://Fuel => increase Fuel
 					cout << "Collision with a Fuel" << endl;
+					Beep(1000, 500);
 					incrementFuel(20);
 					break;
 
 				default: 
-					
-				break;
+					break;
 			}
 		}
 	}
-
-
 }
