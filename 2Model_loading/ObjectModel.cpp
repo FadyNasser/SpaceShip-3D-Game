@@ -100,15 +100,13 @@ bool ObjectModel::Draw(GLuint programID, GLuint MatrixID, GLuint vertexPosition_
 			(void*)0                      // array buffer offset
 	);
 	computeMatricesFromInputs();
-	
 	glm::mat4 SSMVP = getProjectionMatrix() * getViewMatrix() * ModelMatrix;
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &SSMVP[0][0]);
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, TextureIndex);
 	glUniform1i(TextureID, 10);
 	glDrawArrays(GL_TRIANGLES, 0, ObjectBuffers->getVerticesVector().size());
-
-	return true; 
+	return true;
 }
 
 bool ObjectModel::setModelMatrix(glm::mat4 model)
@@ -139,7 +137,6 @@ bool ObjectModel::setTexture(char texName[])
 	}
 	TextureName[i] = '\0';
 	TextureIndex = loadBMP_custom(TextureName);
-
 	return true; 
 }
 
@@ -174,16 +171,18 @@ int ObjectModel::getType()
 	return Type;
 }
 
-void ObjectModel::translateBoundingBox(float x, float y, float z) // changes the position of xMin,yMin,Zmin based on the scaled Xlength and yLength 
+void ObjectModel::translateBoundingBox(float x, float y, float z) 
 {
+	// changes the position of xMin,yMin,Zmin based on the scaled Xlength and yLength 
 	Center.x = x;
 	Center.y = y;
 	Center.z = z;
 }
 
 
-void ObjectModel::scaleBoundingBox(float x, float y, float z) // update xLength , yLength , zLength 
+void ObjectModel::scaleBoundingBox(float x, float y, float z) 
 {
+	// update xLength , yLength , zLength 
 	struct Box myBox = ObjectBuffers->getBufferBoundingBox();
 	xLength = myBox.Xmax - myBox.Xmin;
 	yLength = myBox.Ymax - myBox.Ymin;

@@ -13,8 +13,8 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>//rotation
-#include <glm/gtx/norm.hpp>//rotation
+#include <glm/gtx/euler_angles.hpp> //rotation
+#include <glm/gtx/norm.hpp> //rotation
 using namespace glm;
 
 #include <common/shader.hpp>

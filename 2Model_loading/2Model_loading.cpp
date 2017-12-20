@@ -13,11 +13,10 @@ using namespace std;
 #define Gift 5
 #define Fuel 6
 
-vector<ObjectModel*> Objects(100);
+vector<ObjectModel*> Objects(200);
 char*Textures[] = {"Meteroids.bmp","Asteroids.bmp","Saturn.bmp","Mars.bmp","Mercury.bmp","Venus.bmp","Earth.bmp","Blackhole.bmp","LightTunnel.bmp", "Gift.bmp","Fuel.bmp","FinishLine.bmp"};
 char*ObjectNames[]={"Meteroids.obj","Asteroids.obj","Sphere.obj","Sphere.obj","Sphere.obj","Sphere.obj","Sphere.obj","Blackhole.obj","Blackhole.obj","Gift.obj","Fuel.obj","Blackhole.obj"};
 Buffers ObjectBuffers[] = { Buffers("Meteroids.obj") , Buffers("Asteroids.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj"), Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Blackhole.obj") , Buffers("Blackhole.obj"), Buffers("Gift.obj"), Buffers("Fuel.obj") , Buffers("Blackhole.obj") };
-
 void handleSpaceShipCollision(Spaceship& SS , float dx , float dy , float dz);
 int nObjects = 0;
 
@@ -223,22 +222,22 @@ int main(void)
 
 		if (FuelLeft() > 0)
 		{
-			cout << "Fuel Left = " << FuelLeft() << endl;
+			//cout << "Fuel Left = " << FuelLeft() << endl;
 		}
 		else
 		{
 			cout << "Game Over" << endl;
-			break;
+			//break;
 		}
 		decrementTime(1);
 		if (LeftTime() > 0)
 		{
-			cout << "Time Left = " << LeftTime() << endl;
+			//cout << "Time Left = " << LeftTime() << endl;
 		}
 		else
 		{
 			cout << "Game Over" << endl;
-			break;
+			//break;
 		}
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
