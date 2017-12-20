@@ -7,8 +7,8 @@ using namespace glm;
 using namespace std;
 
 float rightFactor;
-int fuel = 100000;
-int GameTime = 120000;
+int fuel = 1000000000;
+int GameTime = 1200000000;
 
 bool fuelRunOut = false;
 glm::mat4 ViewMatrix;
@@ -168,7 +168,6 @@ void computeMatricesFromInputs()
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;
 }
-
 
 void incrementSpeed(int amount)
 {

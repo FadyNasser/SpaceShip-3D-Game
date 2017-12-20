@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <GL/glew.h>
-
 #include <GL/glfw.h>
 
 
-GLuint loadBMP_custom(const char * imagepath){
-
+GLuint loadBMP_custom(const char * imagepath)
+{
 	printf("Reading image %s\n", imagepath);
 
 	// Data read from the header of the BMP file
@@ -197,6 +195,4 @@ GLuint loadDDS(const char * imagepath){
 	free(buffer); 
 
 	return textureID;
-
-
 }
