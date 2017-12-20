@@ -45,8 +45,7 @@ std::vector<glm::vec2>  Buffers::getUVsVector()
 	return Uvs; 
 }
 
-std::vector<glm::vec3>  Buffers::getNormalsVector()
-{
+std::vector<glm::vec3>  Buffers::getNormalsVector(){
 	return Normals; 
 }
 

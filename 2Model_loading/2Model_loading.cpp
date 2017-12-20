@@ -6,14 +6,15 @@
 #include <string>
 using namespace std;
 
-#define Reward 1
+#define FinishLine 1
 #define Tunnel 2
 #define EndOfGame 3
 #define BlackHole 4
-#define FinishLine 5
+#define Gift 5
+#define Fuel 6
 
 vector<ObjectModel*> Objects(100);
-char*Textures[] = {"Meteroids.bmp","Asteroids.bmp","Saturn.bmp","Mars.bmp","Mercury.bmp","Venus.bmp","Earth.bmp","Blackhole.bmp","LightTunnel.bmp", "Gift.bmp","Fuel.bmp","Samboxsa.bmp"};
+char*Textures[] = {"Meteroids.bmp","Asteroids.bmp","Saturn.bmp","Mars.bmp","Mercury.bmp","Venus.bmp","Earth.bmp","Blackhole.bmp","LightTunnel.bmp", "Gift.bmp","Fuel.bmp","FinishLine.bmp"};
 char*ObjectNames[]={"Meteroids.obj","Asteroids.obj","Sphere.obj","Sphere.obj","Sphere.obj","Sphere.obj","Sphere.obj","Blackhole.obj","Blackhole.obj","Gift.obj","Fuel.obj","Blackhole.obj"};
 Buffers ObjectBuffers[] = { Buffers("Meteroids.obj") , Buffers("Asteroids.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj"), Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Blackhole.obj") , Buffers("Blackhole.obj"), Buffers("Gift.obj"), Buffers("Fuel.obj") , Buffers("Blackhole.obj") };
 
@@ -35,9 +36,13 @@ void ObjectLoader(int id , float dx , float dy , float dz, float sx, float sy, f
 	{
 		type = BlackHole;
 	}
-	else if (id == 9 || id == 10)
+	else if (id == 9)
 	{
-		type = Reward;
+		type = Gift;
+	}
+	else if (id == 10)
+	{
+		type = Fuel;
 	}
 	else
 	{
@@ -150,7 +155,6 @@ int main(void)
 	float orientation = 0.0f;
 	float orientation_sin = 0.0f;
 	float BHorientation = 3.14159f / 2.0f;
-	bool scaleonce = true;
 
 	SceneReader("Scene.txt");
 	
@@ -184,9 +188,6 @@ int main(void)
 
 		for (int i = 0; i < nObjects; i++)
 		{
-			/*glm::mat4 Scaling = Objects[i]->GetModelScaling();
-			glm::mat4 Rotation = Objects[i]->GetModelRotation();
-			glm::mat4 Translation = Objects[i]->GetModelTranslation();*/
 			glm::mat4 XYZRotation;
 			if (Objects[i]->getType() == EndOfGame)
 			{
@@ -200,7 +201,7 @@ int main(void)
 			{
 				XYZRotation = eulerAngleX(BHorientation) * eulerAngleY(orientation*37);
 			}
-			else if (Objects[i]->getType() == Reward)
+			else if (Objects[i]->getType() == Gift || Objects[i]->getType() == Fuel || Objects[i]->getType() == FinishLine)
 			{
 				//Translation = Translation * (translate(mat4(), vec3(1.0f, orientation_sin, 1.0f)));
 				XYZRotation = eulerAngleYXZ(orientation_sin, 0.0f, 0.0f);
@@ -209,34 +210,35 @@ int main(void)
 			{
 				XYZRotation = glm::mat4(1);
 			}
-			//glm::mat4 NewModelMatrix = Translation * Rotation * XYZRotation * Scaling;
-			//glm::mat4 NewModelMatrix = Translation * XYZRotation * Scaling;
-			//Objects[i]->setModelMatrix(NewModelMatrix);
 			Objects[i]->rotateObject(XYZRotation); 
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-			
-			if (Objects[i]->getType() == 2) // change type to see Boundries of Each object #Araaaaaaaf_By7saaaal_El7l
-			{								// El boundary box byrotate m3 el object 
-				//draw lines
-				glLineWidth(10);
-				glBegin(GL_LINES);
-				glVertex3f(Objects[i]->getBoundingBox().Xmin, Objects[i]->getBoundingBox().Ymin, Objects[i]->getBoundingBox().Zmin);
-				glVertex3f(Objects[i]->getBoundingBox().Xmax, Objects[i]->getBoundingBox().Ymax, Objects[i]->getBoundingBox().Zmax);
-				glEnd();
-			}
 		}
 			
 		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
-		//translateBoundingBox is ALREADY CALLED in handleSpaceShip Collision
 		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
 		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
 		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
 		SpaceGhost.setModelMatrix(SSModel);
 		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		if (scaleonce)
+
+		if (FuelLeft() > 0)
 		{
-			SpaceGhost.scaleBoundingBox(0.25f, 0.25f, 0.25f);
-			scaleonce = false;
+			cout << "Fuel Left = " << FuelLeft() << endl;
+		}
+		else
+		{
+			cout << "Game Over" << endl;
+			break;
+		}
+		decrementTime(1);
+		if (LeftTime() > 0)
+		{
+			cout << "Time Left = " << LeftTime() << endl;
+		}
+		else
+		{
+			cout << "Game Over" << endl;
+			break;
 		}
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
@@ -259,49 +261,51 @@ void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 	SS.translateBoundingBox(dx, dy, dz);
 	for (int i = 0; i < nObjects; i++)
 	{
-		collision = Objects[i]->detectCollision(SS.getBoundingBox());
+		collision = Objects[i]->detectCollision(SS.getRadius() , SS.getCenter());
 		if (collision)
 		{
 			int type = Objects[i]->getType();
- 			//cout << "Collision with " << type << " ";
-			cout << SS.getBoundingBox().Xmin << " " << SS.getBoundingBox().Xmax << " ";
-			cout << SS.getBoundingBox().Ymin << " " << SS.getBoundingBox().Ymax << " ";
-			cout << SS.getBoundingBox().Zmin << " " << SS.getBoundingBox().Zmax << endl;
+ 			cout << "Collision with " << type << " ";
  		
 			switch (type) //GAME LOGIC
 			{
-				case 1: //Rewarding
-					cout << "Collision with Gift ";
-					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
-					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
-					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
-				break;
+				case 1: //FinishLine
+					cout << "Congratulation" << endl;
+					EndGame();
+					break;
 
-				case 2: //LightTunnel
-					cout << "Collision with a light tunnel ";
-					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
-					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
-					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
-				break;
+				case 2: //LightTunnel => Increase Speed
+					cout << "Collision with a Light Tunnel" << endl;
+ 					incrementSpeed(10);
+					break;
 
-				case 3: //Collision--> End Game !
-					cout << "Collision with Plant ";
-					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
-					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
-					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
- 				break;
+				case 3: //Planet or Meteriod => Game Over
+					cout << "Collision with a Planet" << endl;
+					EndGame();
+					break;
 
-				case 4: //Blackhole !
-					cout << "COLLISION with Blackhole ";
-					cout << Objects[i]->getBoundingBox().Xmin << " " << Objects[i]->getBoundingBox().Xmax << " ";
-					cout << Objects[i]->getBoundingBox().Ymin << " " << Objects[i]->getBoundingBox().Ymax << " ";
-					cout << Objects[i]->getBoundingBox().Zmin << " " << Objects[i]->getBoundingBox().Zmax << endl;
-				break;
+				case 4: //BlackHole => decrease Speed
+					cout << "Collision with a BlackHole" << endl;
+					decrementSpeed(10);
+					decrementTime(5);
+					break;
 
-				default: //FinishLine
-					cout <<"" ;
+				case 5://Gift => increase Time Left
+					cout << "Collision with a Gift"<< endl;
+					incrementTime(20);
+					break;
+
+				case 6://Fuel => increase Fuel
+					cout << "Collision with a Fuel" << endl;
+					incrementFuel(20);
+					break;
+
+				default: 
+					
 				break;
 			}
 		}
 	}
+
+
 }

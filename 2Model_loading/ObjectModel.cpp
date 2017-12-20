@@ -1,7 +1,7 @@
 #include "ObjectModel.h"
 #include <iostream>
 using namespace std;
-float BHorientation = 3.14159f / 2.0f;
+
 
 ObjectModel::ObjectModel()
 {
@@ -21,6 +21,8 @@ glm::mat4 ObjectModel::GetModelRotation()
 	return this->Rotation;
 }
 
+
+
 ObjectModel::ObjectModel(char* texName, Buffers* buffers , int type)
 {
 	ObjectBuffers = buffers;
@@ -35,22 +37,21 @@ ObjectModel::ObjectModel(char* texName, Buffers* buffers , int type)
 	TextureIndex = loadBMP_custom(TextureName);
 	Type = type; 
 	ObjectBoundingBox = getBuffers()->getBufferBoundingBox();
-	if (Type == 2 || Type == 4)
-	{
-		//RotateBoundingBox();
-		//ObjectBoundingBox.Xmax += 0.25;
-		//ObjectBoundingBox.Xmin -= 0.25;
-		//ObjectBoundingBox.Ymax += 0.25;
-		//ObjectBoundingBox.Ymin -= 0.25;
-		//ObjectBoundingBox.Zmax += 0.25;
-		//ObjectBoundingBox.Zmin -= 0.25;
-	}
 	xLength = ObjectModel::ObjectBoundingBox.Xmax - ObjectModel::ObjectBoundingBox.Xmin;
 	yLength = ObjectModel::ObjectBoundingBox.Ymax - ObjectModel::ObjectBoundingBox.Ymin;
 	zLength = ObjectModel::ObjectBoundingBox.Zmax - ObjectModel::ObjectBoundingBox.Zmin;
+
+	// collision with a sphere 
+	Radius = xLength > yLength ? xLength : yLength; 
+	Radius = Radius > zLength ? Radius : zLength; 
+	Radius = Radius / 2; 
+	Center.x = 0; 
+	Center.y = 0; 
+	Center.z = 0; 
 }
 
-ObjectModel::ObjectModel(char* ObjName, char *texName) // Special Constructor for spaceship
+// Special Constructor for spaceship
+ObjectModel::ObjectModel(char* ObjName, char *texName)
 {
 	ObjectBuffers = new Buffers(ObjName); 
 	int i = 0;
@@ -99,12 +100,14 @@ bool ObjectModel::Draw(GLuint programID, GLuint MatrixID, GLuint vertexPosition_
 			(void*)0                      // array buffer offset
 	);
 	computeMatricesFromInputs();
+	
 	glm::mat4 SSMVP = getProjectionMatrix() * getViewMatrix() * ModelMatrix;
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &SSMVP[0][0]);
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, TextureIndex);
 	glUniform1i(TextureID, 10);
 	glDrawArrays(GL_TRIANGLES, 0, ObjectBuffers->getVerticesVector().size());
+
 	return true; 
 }
 
@@ -127,6 +130,7 @@ void ObjectModel::constructModelMatrix( glm::vec3 Translation, glm::vec3 Scaling
 
 bool ObjectModel::setTexture(char texName[])
 {
+
 	int i = 0;
 	while (texName[i] != '\0')
 	{
@@ -135,6 +139,7 @@ bool ObjectModel::setTexture(char texName[])
 	}
 	TextureName[i] = '\0';
 	TextureIndex = loadBMP_custom(TextureName);
+
 	return true; 
 }
 
@@ -150,15 +155,18 @@ Buffers* ObjectModel::getBuffers()
 
 bool ObjectModel::detectCollision(Box b)
 {
-	//Box a = getBoundingBox(); // my bounding box
-	bool Xintersection = (ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin) || (ObjectBoundingBox.Xmax <= b.Xmin && ObjectBoundingBox.Xmin >= b.Xmax);
-	bool Yintersection = (ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin) || (ObjectBoundingBox.Ymax <= b.Ymin && ObjectBoundingBox.Ymin >= b.Ymax);
-	bool Zintersection = (ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin) || (ObjectBoundingBox.Zmax <= b.Zmin && ObjectBoundingBox.Zmin >= b.Zmax);
-	if (Xintersection && Yintersection && Zintersection)
-	{
-		cout << "Collision Happened " << Type << endl;
-	}
+	bool Xintersection = (ObjectBoundingBox.Xmin <= b.Xmax && ObjectBoundingBox.Xmax >= b.Xmin);// || (ObjectBoundingBox.Xmax <= b.Xmin && ObjectBoundingBox.Xmin >= b.Xmax);
+	bool Yintersection = (ObjectBoundingBox.Ymin <= b.Ymax && ObjectBoundingBox.Ymax >= b.Ymin);// || (ObjectBoundingBox.Ymax <= b.Ymin && ObjectBoundingBox.Xmin >= b.Ymax);
+	bool Zintersection = (ObjectBoundingBox.Zmin <= b.Zmax && ObjectBoundingBox.Zmax >= b.Zmin);// || (ObjectBoundingBox.Zmax <= b.Zmin && ObjectBoundingBox.Xmin >= b.Zmax);
 	return (Xintersection && Yintersection && Zintersection);
+}
+bool ObjectModel::detectCollision(float r, Point c)
+{
+	float X = Center.x - c.x; 
+	float Y= Center.y - c.y;
+	float Z= Center.z - c.z;
+	float distance = sqrt(X*X + Y*Y + Z*Z); 
+	return (r + Radius > distance); 
 }
 
 int ObjectModel::getType()
@@ -168,13 +176,11 @@ int ObjectModel::getType()
 
 void ObjectModel::translateBoundingBox(float x, float y, float z) // changes the position of xMin,yMin,Zmin based on the scaled Xlength and yLength 
 {
-	ObjectBoundingBox.Xmax = x + (xLength / 2);
-	ObjectBoundingBox.Xmin = x - (xLength / 2);
-	ObjectBoundingBox.Ymax = y + (yLength / 2);
-	ObjectBoundingBox.Ymin = y - (yLength / 2);
-	ObjectBoundingBox.Zmax = z + (zLength / 2);
-	ObjectBoundingBox.Zmin = z - (zLength / 2);
+	Center.x = x;
+	Center.y = y;
+	Center.z = z;
 }
+
 
 void ObjectModel::scaleBoundingBox(float x, float y, float z) // update xLength , yLength , zLength 
 {
@@ -185,6 +191,9 @@ void ObjectModel::scaleBoundingBox(float x, float y, float z) // update xLength 
 	xLength *= x;
 	yLength *= y;
 	zLength *= z;
+	Radius = xLength > yLength ? xLength : yLength;
+	Radius = Radius > zLength ? Radius : zLength;
+	Radius = Radius / 2;
 }
 
 void ObjectModel::rotateObject(glm::mat4 newRotation)
@@ -193,13 +202,12 @@ void ObjectModel::rotateObject(glm::mat4 newRotation)
 	ModelMatrix = Translation*Rotation*Scaling;
 }
 
-void ObjectModel::RotateBoundingBox()
+Point ObjectModel::getCenter()
 {
-	//y' = y*cos q - z*sin q
-	//z' = y*sin q + z*cos q
-	//x' = x
-	ObjectBoundingBox.Ymax = ObjectBoundingBox.Ymax * cos(BHorientation) - ObjectBoundingBox.Zmax * sin(BHorientation);
-	ObjectBoundingBox.Ymin = ObjectBoundingBox.Ymin * cos(BHorientation) - ObjectBoundingBox.Zmin * sin(BHorientation);
-	ObjectBoundingBox.Zmax = ObjectBoundingBox.Ymax * sin(BHorientation) - ObjectBoundingBox.Zmax * cos(BHorientation);
-	ObjectBoundingBox.Zmin = ObjectBoundingBox.Ymin * sin(BHorientation) - ObjectBoundingBox.Zmin * cos(BHorientation);
+	return this->Center; 
+}
+
+float ObjectModel::getRadius()
+{
+	return this->Radius;
 }
