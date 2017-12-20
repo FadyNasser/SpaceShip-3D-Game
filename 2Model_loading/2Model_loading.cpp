@@ -43,7 +43,7 @@ void ObjectLoader(int id , float dx , float dy , float dz, float sx, float sy, f
 	{
 		type = Fuel;
 	}
-	else
+	else if (id == 11)
 	{
 		type = FinishLine;
 	}
@@ -51,7 +51,7 @@ void ObjectLoader(int id , float dx , float dy , float dz, float sx, float sy, f
 	glm::vec3 Scaling( sx, sy, sz);
 	glm::vec3 Rotation (rx, ry, rz);
 	glm::vec3 Translation(dx, dy, dz);
-	Objects[nObjects]->constructModelMatrix(Translation,Scaling, Rotation); // translate object and bounding box 
+	Objects[nObjects]->constructModelMatrix(Translation,Scaling, Rotation);
 	nObjects++;
 }
 
@@ -204,10 +204,6 @@ int main(void)
 			{
 				//Translation = Translation * (translate(mat4(), vec3(1.0f, orientation_sin, 1.0f)));
 				XYZRotation = eulerAngleYXZ(orientation_sin, 0.0f, 0.0f);
-			}
-			else
-			{
-				XYZRotation = glm::mat4(1);
 			}
 			Objects[i]->rotateObject(XYZRotation); 
 			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
