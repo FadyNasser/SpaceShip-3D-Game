@@ -7,7 +7,9 @@ using namespace glm;
 using namespace std;
 
 float rightFactor;
-float fuel = 10000;
+int fuel = 100000;
+int GameTime = 120000;
+
 bool fuelRunOut = false;
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
@@ -121,7 +123,7 @@ void computeMatricesFromInputs()
 	fuel -= factor;
 	if (fuel <= 0) 
 	{
-		cout << "run out of fuel"; 
+		//cout << "run out of fuel"; 
 		fuelRunOut = true;
     }
     // Move Up
@@ -165,4 +167,43 @@ void computeMatricesFromInputs()
 
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;
+}
+
+
+void incrementSpeed(int amount)
+{
+	speed += amount;
+}
+void decrementSpeed(int amount)
+{
+	speed -= amount;
+}
+void incrementFuel(int amount)
+{
+	fuel += amount;
+}
+void decrementFuel(int amount)
+{
+	fuel -= amount;
+}
+int FuelLeft()
+{
+	return fuel;
+}
+int LeftTime()
+{
+	return GameTime;
+}
+void incrementTime(int sec)
+{
+	GameTime += sec;
+}
+void decrementTime(int sec)
+{
+	GameTime -= sec;
+}
+void EndGame()
+{
+	fuel = 0;
+	GameTime = 0;
 }

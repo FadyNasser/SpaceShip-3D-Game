@@ -7,4 +7,14 @@ glm::mat4 getProjectionMatrix();
 glm::vec3 getCameraPosition();
 glm::vec3 getSSPosition();
 
+void incrementSpeed(int amount);
+void decrementSpeed(int amount);
+void incrementFuel(int amount);
+void decrementFuel(int amount);
+int FuelLeft();
+int LeftTime();
+void incrementTime(int sec);
+void decrementTime(int sec);
+void EndGame();
+
 #endif
