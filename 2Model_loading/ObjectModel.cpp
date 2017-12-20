@@ -98,9 +98,9 @@ bool ObjectModel::Draw(GLuint programID, GLuint MatrixID, GLuint vertexPosition_
 	computeMatricesFromInputs();
 	glm::mat4 SSMVP = getProjectionMatrix() * getViewMatrix() * ModelMatrix;
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &SSMVP[0][0]);
-	glActiveTexture(GL_TEXTURE12);
+	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, TextureIndex);
-	glUniform1i(TextureID, 12);
+	glUniform1i(TextureID, 11);
 	glDrawArrays(GL_TRIANGLES, 0, ObjectBuffers->getVerticesVector().size());
 	return true;
 }

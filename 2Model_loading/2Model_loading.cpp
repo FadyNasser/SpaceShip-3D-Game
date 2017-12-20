@@ -139,7 +139,7 @@ int main(void)
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals; // Won't be used at the moment.
 
-	for (int j = 0; j < 11; j++)
+	for (int j = 0; j < 12; j++)
 	{
 		ObjectBuffers[j].Create();
 	}
@@ -196,11 +196,11 @@ int main(void)
 			{
 				XYZRotation = eulerAngleX(BHorientation);
 			}
-			else if (Objects[i]->getType() == BlackHole)
+			else if (Objects[i]->getType() == BlackHole || Objects[i]->getType() == FinishLine)
 			{
 				XYZRotation = eulerAngleX(BHorientation) * eulerAngleY(orientation*37);
 			}
-			else if (Objects[i]->getType() == Gift || Objects[i]->getType() == Fuel || Objects[i]->getType() == FinishLine)
+			else if (Objects[i]->getType() == Gift || Objects[i]->getType() == Fuel)
 			{
 				//Translation = Translation * (translate(mat4(), vec3(1.0f, orientation_sin, 1.0f)));
 				XYZRotation = eulerAngleYXZ(orientation_sin, 0.0f, 0.0f);
@@ -218,22 +218,22 @@ int main(void)
 
 		if (FuelLeft() > 0)
 		{
-			//cout << "Fuel Left = " << FuelLeft() << endl;
+			cout << "Fuel Left = " << FuelLeft() << endl;
 		}
 		else
 		{
 			cout << "Game Over" << endl;
-			//break;
+			break;
 		}
 		decrementTime(1);
 		if (LeftTime() > 0)
 		{
-			//cout << "Time Left = " << LeftTime() << endl;
+			cout << "Time Left = " << LeftTime() << endl;
 		}
 		else
 		{
 			cout << "Game Over" << endl;
-			//break;
+			break;
 		}
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
