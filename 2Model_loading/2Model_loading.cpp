@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <Windows.h>
+
 using namespace std;
 
 #define FinishLine 1
@@ -19,61 +20,68 @@ char*ObjectNames[]={"Meteroids.obj","Asteroids.obj","Sphere.obj","Sphere.obj","S
 Buffers ObjectBuffers[] = { Buffers("Meteroids.obj") , Buffers("Asteroids.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Sphere.obj"), Buffers("Sphere.obj") , Buffers("Sphere.obj") , Buffers("Blackhole.obj") , Buffers("Blackhole.obj"), Buffers("Gift.obj"), Buffers("Fuel.obj") , Buffers("Blackhole.obj") };
 void handleSpaceShipCollision(Spaceship& SS , float dx , float dy , float dz);
 int nObjects = 0;
+bool endofGame = false;
+int nSpeed = 0;
+int SSvibration = 0.05;
 
 void ObjectLoader(int id , float dx , float dy , float dz, float sx, float sy, float sz, float rx, float ry, float rz)
 {
-	int type;
-	if (id >= 0 && id <= 6)
-	{
-		type = EndOfGame;
-	}
-	else if (id == 8)
-	{
-		type = Tunnel;
-	}
-	else if (id == 7)
-	{
-		type = BlackHole;
-	}
-	else if (id == 9)
-	{
-		type = Gift;
-	}
-	else if (id == 10)
-	{
-		type = Fuel;
-	}
-	else if (id == 11)
-	{
-		type = FinishLine;
-	}
-	Objects[nObjects] = new ObjectModel(Textures[id],&ObjectBuffers[id],type); 
-	glm::vec3 Scaling( sx, sy, sz);
-	glm::vec3 Rotation (rx, ry, rz);
-	glm::vec3 Translation(dx, dy, dz);
-	Objects[nObjects]->constructModelMatrix(Translation,Scaling, Rotation);
-	nObjects++;
+    int type;
+    if (id >= 0 && id <= 6)
+    {
+        type = EndOfGame;
+    }
+    else if (id == 8)
+    {
+        type = Tunnel;
+    }
+    else if (id == 7)
+    {
+        type = BlackHole;
+    }
+    else if (id == 9)
+    {
+        type = Gift;
+    }
+    else if (id == 10)
+    {
+        type = Fuel;
+    }
+    else if (id == 11)
+    {
+        type = FinishLine;
+    }
+    else
+    {
+        type = EndOfGame;
+    }
+    Objects[nObjects] = new ObjectModel(Textures[id],&ObjectBuffers[id],type);
+    glm::vec3 Scaling( sx, sy, sz);
+    glm::vec3 Rotation (rx, ry, rz);
+    glm::vec3 Translation(dx, dy, dz);
+    Objects[nObjects]->constructModelMatrix(Translation,Scaling, Rotation);
+    nObjects++;
 }
 
-void SceneReader(string filename) //Scene.txt
+void SceneReader(char* filename) //Scene.txt
 {
-	int ID; 
-	float dX, dY, dZ;
-	float sX, sY, sZ;
-	float rX, rY, rZ;
-	string line;
-	ifstream myfile(filename);
-	if (myfile.is_open())
-	{
-		while (!myfile.eof())
-		{
-			myfile >> ID >> dX >> dY >> dZ;
-			myfile >> sX >> sY >> sZ;
-			myfile >> rX >> rY >> rZ;
-			ObjectLoader(ID, dX, dY, dZ,sX,sY,sZ,rZ,rY,rZ);
-		}
-	}
-	else cout << "Unable to open file";
+    int ID;
+    float dX, dY, dZ;
+    float sX, sY, sZ;
+    float rX, rY, rZ;
+    string line;
+    ifstream myfile(filename);
+    if (myfile.is_open())
+    {
+        while (!myfile.eof())
+        {
+            myfile >> ID >> dX >> dY >> dZ;
+            myfile >> sX >> sY >> sZ;
+            myfile >> rX >> rY >> rZ;
+            ObjectLoader(ID, dX, dY, dZ,sX,sY,sZ,rZ,rY,rZ);
+        }
+    }
+    else cout << "Unable to open file";
 }
 
 int main(void)
@@ -98,8 +106,8 @@ int main(void)
     }
 
     // Initialize GLEW
-    if (glewInit() != GLEW_OK) 
-	{
+    if (glewInit() != GLEW_OK)
+    {
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
@@ -123,7 +131,6 @@ int main(void)
 
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader");
-
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -137,26 +144,27 @@ int main(void)
     /*Vertices , UV and Normals Loading*/
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals; // Won't be used at the moment.
+    std::vector<glm::vec3> normals;
 
-	for (int j = 0; j < 12; j++)
-	{
-		ObjectBuffers[j].Create();
-	}
+    for (int j = 0; j < 12; j++)
+    {
+        ObjectBuffers[j].Create();
+    }
 
     Spaceship SpaceGhost;
-	ObjectModel SkySphere("Skysphere.bmp", &ObjectBuffers[3], 0);
+    ObjectModel SkySphere("Skysphere.bmp", &ObjectBuffers[3], 0);
 
     // For speed computation
-	double lastTime = glfwGetTime();
-	double lastFrameTime = lastTime;
-	int nbFrames = 0;
-	float orientation = 0.0f;
-	float orientation_sin = 0.0f;
-	float BHorientation = 3.14159f / 2.0f;
+    double lastTime = glfwGetTime();
+    double lastFrameTime = lastTime;
+    int nbFrames = 0;
+    float orientation = 0.0f;
+    float orientation_sin = 0.0f;
+    float BHorientation = 3.14159f / 2.0f;
 
-	SceneReader("Scene.txt");
-	
+    SceneReader("Scene.txt");
+    initText2D( "LCDish.tga" );
+
     do
     {
         // Clear the screen
@@ -165,76 +173,118 @@ int main(void)
         // Use our shader
         glUseProgram(programID);
 
-		// Measure speed
-		double currentTime = glfwGetTime();
-		float deltaTime = (float)(currentTime - lastFrameTime);
-		lastFrameTime = currentTime;
-		nbFrames++;
-		if (currentTime - lastTime >= 1.0)
-		{
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
-		orientation += 3.14159f / 6.0f * deltaTime;
-		orientation_sin = sin(3.14159f / 2.0f * currentTime);
+        // Measure speed
+        double currentTime = glfwGetTime();
+        float deltaTime = (float)(currentTime - lastFrameTime);
+        lastFrameTime = currentTime;
+        nbFrames++;
+        if (currentTime - lastTime >= 1.0)
+        {
+            nbFrames = 0;
+            lastTime += 1.0;
+        }
+        orientation += 3.14159f / 6.0f * deltaTime;
+        orientation_sin = sin(3.14159f / 2.0f * currentTime);
 
-		computeMatricesFromInputs();
-		glm::mat4 SceneScaling = scale(mat4(), vec3(100.0f, 100.0f, 100.0f));
-		glm::mat4 SceneTranslation = translate(mat4(), getCameraPosition());
-		glm::mat4 SceneModel = SceneTranslation* SceneScaling;
-		SkySphere.setModelMatrix(SceneModel);
-		SkySphere.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+        computeMatricesFromInputs();
+        glm::mat4 SceneScaling = scale(mat4(), vec3(100.0f, 100.0f, 100.0f));
+        glm::mat4 SceneTranslation = translate(mat4(), getCameraPosition());
+        glm::mat4 SceneModel = SceneTranslation* SceneScaling;
+        SkySphere.setModelMatrix(SceneModel);
+        SkySphere.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
 
-		for (int i = 0; i < nObjects; i++)
+        if(!endofGame && getLeftTime()!=0 && getFuelLeft()!=0)
 		{
-			glm::mat4 XYZRotation;
-			if (Objects[i]->getType() == EndOfGame)
-			{
-				XYZRotation = eulerAngleY(orientation) * eulerAngleZ(orientation);
-			}
-			else if (Objects[i]->getType() == Tunnel)
-			{
-				XYZRotation = eulerAngleX(BHorientation);
-			}
-			else if (Objects[i]->getType() == BlackHole || Objects[i]->getType() == FinishLine)
-			{
-				XYZRotation = eulerAngleX(BHorientation) * eulerAngleY(orientation*37);
-			}
-			else if (Objects[i]->getType() == Gift || Objects[i]->getType() == Fuel)
-			{
-				//Translation = Translation * (translate(mat4(), vec3(1.0f, orientation_sin, 1.0f)));
-				XYZRotation = eulerAngleYXZ(orientation_sin, 0.0f, 0.0f);
-			}
-			Objects[i]->rotateObject(XYZRotation); 
-			Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
-		}
-			
-		handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
-		glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
-		glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
-		glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
-		SpaceGhost.setModelMatrix(SSModel);
-		SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+            for (int i = 0; i < nObjects; i++)
+            {
+                if(nSpeed>0)
+				{     
+					Objects[i]->translateObject(0, 0, 0.5);
+                    decrementSpeed(0.0001);
+                    nSpeed--;
+                    printf("\n Current Speed %d", nSpeed);
+				}
+                else 
+				{
+                    decrementFuel();
+                }
 
-		if (FuelLeft() > 0)
+                int objectZ = Objects[i]->getCenter().z;
+                if (objectZ > getSSPosition().z)
+                {
+					float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2.0);
+                    float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/3.0);
+                    Objects[i]->translateObject(r1-r2, r2-r1, getSSPosition().z-10);
+                }
+
+                glm::mat4 XYZRotation;
+                if (Objects[i]->getType() == EndOfGame)
+                {
+                    XYZRotation = eulerAngleY(orientation) * eulerAngleZ(orientation);
+                }
+                else if (Objects[i]->getType() == Tunnel)
+                {
+                    XYZRotation = eulerAngleX(BHorientation);
+                }
+                else if (Objects[i]->getType() == BlackHole || Objects[i]->getType() == FinishLine)
+                {
+                    XYZRotation = eulerAngleX(BHorientation) * eulerAngleY(orientation*37);
+                }
+                else if (Objects[i]->getType() == Gift || Objects[i]->getType() == Fuel)
+                {
+                    //Translation = Translation * (translate(mat4(), vec3(1.0f, orientation_sin, 1.0f)));
+                    XYZRotation = eulerAngleYXZ(orientation_sin, 0.0f, 0.0f);
+                }
+                else
+                {
+                    XYZRotation = glm::mat4(1);
+                }
+                Objects[i]->rotateObject(XYZRotation);
+                Objects[i]->Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+            }
+            if (nSpeed > 0) 
+			{
+                 SpaceGhost.translateObject(0, -SSvibration, 0);
+            }
+
+            handleSpaceShipCollision(SpaceGhost, getSSPosition().x, getSSPosition().y, getSSPosition().z);
+            glm::mat4 SpaceshipScaling = scale(mat4(), vec3(0.25f, 0.25f, 0.5f));
+            glm::mat4 SpaceshipTranslation = translate(mat4(), getSSPosition());
+            glm::mat4 SSModel = SpaceshipTranslation*SpaceshipScaling;
+            SpaceGhost.setModelMatrix(SSModel);
+            SpaceGhost.Draw(programID, MatrixID, vertexPosition_modelspaceID, vertexUVID, TextureID);
+            char text[256] = "Fuel";
+            printText2D(text,10,500, 25);
+
+            char time[256] = "Time";
+            printText2D(time,10,450, 25);
+
+            //Displaying score
+            if (getFuelLeft() > 0)
+            {
+                char currentFuel[256];
+                snprintf(currentFuel, sizeof(currentFuel), "%d", getFuelLeft());
+                printText2D(currentFuel,130,500, 25);
+				//cout << "current score " << currentScore <<endl;
+				//cout << "Fuel Left = " << getFuelLeft() << endl;
+            }
+            else
+            {
+                endofGame = true;
+            }
+            decrementTime(1);
+            if (getLeftTime() > 0)
+            {
+                char currentTime[256];
+                snprintf(currentTime, sizeof(currentTime), "%d", getLeftTime());
+                printText2D(currentTime,130,450, 25);
+            }
+        }
+        else
 		{
-			cout << "Fuel Left = " << FuelLeft() << endl;
-		}
-		else
-		{
-  			cout << "Game Over" << endl;
-			break;
-		}
-		decrementTime(1);
-		if (LeftTime() > 0)
-		{
-			cout << "Time Left = " << LeftTime() << endl;
-		}
-		else
-		{
-			cout << "Game Over" << endl;
-			break;
-		}
+            char GameOver[256] = "Game Over";
+            printText2D(GameOver,150,270, 50);
+        }
 
         glDisableVertexAttribArray(vertexPosition_modelspaceID);
         glDisableVertexAttribArray(vertexUVID);
@@ -252,58 +302,59 @@ int main(void)
 
 void handleSpaceShipCollision(Spaceship& SS, float dx, float dy, float dz)
 {
-	bool collision;
-	SS.translateBoundingBox(dx, dy, dz);
-	for (int i = 0; i < nObjects; i++)
-	{
-		collision = Objects[i]->detectCollision(SS.getRadius() , SS.getCenter());
-		if (collision)
-		{
-			int type = Objects[i]->getType();
- 			cout << "Collision with " << type << " ";
- 		
-			switch (type) //GAME LOGIC
-			{    
-				case 1: //FinishLine
-					cout << "Congratulation" << endl;
-					Beep(950, 1000);					
-					EndGame();
-					break;
+    bool collision;
+    SS.translateBoundingBox(dx, dy, dz);
+    for (int i = 0; i < nObjects; i++)
+    {
+        collision = Objects[i]->detectCollision(SS.getRadius() , SS.getCenter());
+        if (collision)
+        {
+            int type = Objects[i]->getType();
+            cout << "Collision with " << type << " ";
 
-				case 2: //LightTunnel => Increase Speed
-					cout << "Collision with a Light Tunnel" << endl;
-					Beep(150, 1000);
- 					incrementSpeed(5);
-					break;
+            switch (type) //GAME LOGIC
+            {
+                case 1: //FinishLine
+                    cout << "Congratulations" << endl;
+                    Beep(950, 1000);
+                    EndGame();
+                    break;
 
-				case 3: //Planet or Meteriod => Game Over
-					cout << "Collision with a Planet" << endl;
-					Beep(400, 1000);
-					EndGame();
-					break;
+                case 2: //LightTunnel => Increase Speed
+                    cout << "Collision with a Light Tunnel" << endl;
+                    nSpeed = 1000;
+					//Beep(150, 1000);
+                    incrementSpeed(1000);
+                    break;
 
-				case 4: //BlackHole => decrease Speed
-					cout << "Collision with a BlackHole" << endl;
-					Beep(200, 1000);
-					decrementSpeed(5);
-					decrementTime(20);
-					break;
+                case 3: //Planet or Meteriod => Game Over
+                    cout << "Collision with a Planet" << endl;
+                    //Beep(400, 1000);
+                    endofGame = true;
+                    EndGame();
+                break;
+                case 4: //BlackHole => decrease Speed
+                    cout << "Collision with a BlackHole" << endl;
+					//Beep(200, 1000);
+                    decrementSpeed(1);
+                    decrementTime(20);
+                    break;
 
-				case 5://Gift => increase Time Left
-					cout << "Collision with a Gift"<< endl;
-					Beep(1000, 500);
-					incrementTime(20);
-					break;
+                case 5://Gift => increase Time Left
+                    cout << "Collision with a Gift"<< endl;
+					//Beep(1000, 500);
+                    incrementTime(20);
+                    break;
 
-				case 6://Fuel => increase Fuel
-					cout << "Collision with a Fuel" << endl;
-					Beep(1000, 500);
-					incrementFuel(20);
-					break;
+                case 6://Fuel => increase Fuel
+                    cout << "Collision with a Fuel" << endl;
+					//Beep(1000, 500);
+                    incrementFuel(20);
+                    break;
 
-				default: 
-					break;
-			}
-		}
-	}
+                default:
+                    break;
+            }
+        }
+    }
 }
