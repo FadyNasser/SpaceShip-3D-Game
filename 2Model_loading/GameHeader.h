@@ -6,6 +6,7 @@
 #include <string>
 // Include GLEW
 #include <GL/glew.h>
+
 // Include GLFW
 #include <GL/glfw.h>
 // Include GLM
@@ -20,3 +21,9 @@ using namespace glm;
 #include <common/controls.hpp>
 #include <common/objloader.hpp>
 #include <common/text2D.hpp>
+
+enum state{
+    MENU,
+    GAMESTARTED,
+    GAMEENDED
+};

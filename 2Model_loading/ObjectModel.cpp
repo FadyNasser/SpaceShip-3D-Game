@@ -2,10 +2,12 @@
 #include <iostream>
 using namespace std;
 
+
 ObjectModel::ObjectModel()
 {
     printf("\n Default Constructor \n");
 }
+
 glm::mat4 ObjectModel::GetModelTranslation()
 {
     return this->Translation;
@@ -178,6 +180,7 @@ void ObjectModel::translateObject(float x, float y, float z)
     int xNew = Center.x + x, yNew = Center.y + y, zNew = Center.z + z;
     this->Translation = translate(mat4(), glm::vec3(xNew,yNew,zNew));
     translateBoundingBox(xNew, yNew, zNew);
+
 }
 
 void ObjectModel::scaleBoundingBox(float x, float y, float z)
