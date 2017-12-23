@@ -2,10 +2,12 @@
 #include <iostream>
 using namespace std;
 
+
 ObjectModel::ObjectModel()
 {
     printf("\n Default Constructor \n");
 }
+
 glm::mat4 ObjectModel::GetModelTranslation()
 {
     return this->Translation;
@@ -96,9 +98,9 @@ bool ObjectModel::Draw(GLuint programID, GLuint MatrixID, GLuint vertexPosition_
     computeMatricesFromInputs();
     glm::mat4 SSMVP = getProjectionMatrix() * getViewMatrix() * ModelMatrix;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &SSMVP[0][0]);
-    glActiveTexture(GL_TEXTURE11);
+    glActiveTexture(GL_TEXTURE12);
     glBindTexture(GL_TEXTURE_2D, TextureIndex);
-    glUniform1i(TextureID, 11);
+    glUniform1i(TextureID, 12);
     glDrawArrays(GL_TRIANGLES, 0, ObjectBuffers->getVerticesVector().size());
     return true;
 }
@@ -115,7 +117,7 @@ void ObjectModel::constructModelMatrix( glm::vec3 Translation, glm::vec3 Scaling
     this->Scaling = scale(mat4(),Scaling);
     this->Rotation = eulerAngleYXZ(Rotation.y, Rotation.x, Rotation.z);
     this->ModelMatrix = this->Translation*this->Rotation*this->Scaling;
-    // ORDER MATTERS : Scale BoundingBox then translate it ...NEVER THE OPPOSITE
+    //ORDER MATTERS : Scale BoundingBox then translate it ...NEVER THE OPPOSITE
     scaleBoundingBox(Scaling.x, Scaling.y, Scaling.z);
     translateBoundingBox(Translation.x, Translation.y, Translation.z);
 }
@@ -178,6 +180,7 @@ void ObjectModel::translateObject(float x, float y, float z)
     int xNew = Center.x + x, yNew = Center.y + y, zNew = Center.z + z;
     this->Translation = translate(mat4(), glm::vec3(xNew,yNew,zNew));
     translateBoundingBox(xNew, yNew, zNew);
+
 }
 
 void ObjectModel::scaleBoundingBox(float x, float y, float z)
