@@ -2,7 +2,7 @@
 #ifndef OBJLOADER_H
 #define OBJLOADER_H
 
-#include "./2Model_loading/Buffers.h"
+#include "./GuardiansGame/Buffers.h"
 
 bool loadOBJ(
         const char * path,

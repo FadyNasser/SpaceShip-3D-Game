@@ -8,9 +8,7 @@ using namespace std;
 
 float rightFactor;
 int fuel = 10000;
-int GameTime = 12000;
 
-bool fuelRunOut = false;
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 glm::vec3 position = glm::vec3(0, 0, 5);
@@ -45,7 +43,7 @@ float verticalAngle = 0.0f;
 // Initial Field of View
 float initialFoV = 45.0f;
 
-float horizontalSpeed = 6, verticalSpeed = 12, forwardSpeed = 40.0f; // 3 units / second
+float horizontalSpeed = 6, verticalSpeed = 6, forwardSpeed = 40.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 bool wasPressed = false;
 float factor = 0.0f, tunnelFactor = 1.0f;
@@ -63,14 +61,10 @@ void computeMatricesFromInputs()
 
     // Get mouse position
     if(firstTime)
-	{
+    {
         firstTime = false;
         glfwGetMousePos(&xpos, &ypos);
     }
-
-    // Reset mouse position for next frame
-    // EDIT : Doesn't work on Mac OS, hence the code below is a bit different from the website's
-    //glfwSetMousePos(1024/2, 768/2);
 
     // Compute new orientation
     horizontalAngle = 3.14f + mouseSpeed * float(1024 / 2 - xpos);
@@ -101,41 +95,36 @@ void computeMatricesFromInputs()
     {
         if (wasPressed && factor < 1)
         {
-            factor += 0.0004;
+            factor += 0.0002;
         }
         else if (!wasPressed)
         {
             factor = 0.0;
         }
         wasPressed = true;
-        if (!fuelRunOut)
-        {
-            position += direction * deltaTime * forwardSpeed * factor*tunnelFactor;
-        }
+            position += direction * deltaTime * forwardSpeed * factor;
     }
     if (glfwGetKey(GLFW_KEY_SPACE) != GLFW_PRESS && factor > 0)
     {
         factor -= 0.0001;
-        if (!fuelRunOut)
-        {
-            position += direction * deltaTime * forwardSpeed * factor*tunnelFactor;
-        }
+            position += direction * deltaTime * forwardSpeed * factor;
     }
 
-    if (fuel <= 0)
-    {
-        //cout << "run out of fuel";
-        fuelRunOut = true;
-    }
     // Move Up
     if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS)
     {
-        position += up * deltaTime * verticalSpeed;
+        if (SSPosition.y <= 1)
+        {
+             position += up * deltaTime * verticalSpeed;
+        }
     }
     // Move Down
     if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        position -= up * deltaTime * verticalSpeed;
+        if (SSPosition.y >= -1)
+        {
+            position -= up * deltaTime * verticalSpeed;
+        }
     }
     // Strafe right
     if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS)
@@ -180,6 +169,7 @@ void decrementSpeed(int amount)
 }
 void stop()
 {
+    forwardSpeed = 40.0f;
     factor = 0;
 }
 
@@ -195,20 +185,7 @@ int getFuelLeft()
 {
     return fuel;
 }
-int getLeftTime()
-{
-    return GameTime;
-}
-void incrementTime(int sec)
-{
-    GameTime += sec;
-}
-void decrementTime(int sec)
-{
-    GameTime -= sec;
-}
 void EndGame()
 {
     fuel = 0;
-    GameTime = 0;
 }
